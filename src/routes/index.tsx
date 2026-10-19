@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Wind, Waves, Minus, Sparkles, Flame, ShieldCheck, Thermometer, Zap } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Wind, Waves, Minus, Sparkles, Flame, ShieldCheck, Thermometer, Zap, Tag, Truck } from "lucide-react";
 import img1 from "@/assets/styler-1.jpg.asset.json";
 import img2 from "@/assets/styler-2.jpg.asset.json";
 import img3 from "@/assets/styler-3.jpg.asset.json";
@@ -32,6 +33,87 @@ const perks = [
   { icon: Zap, title: "Click-on heads", text: "Swap attachments in seconds with the unlock button." },
 ];
 
+const PROMO_CODE = "XELEX500";
+
+const announcements = [
+  { icon: Tag, pre: "Use promo", code: PROMO_CODE, post: "to get Rs 500 off" },
+  { icon: Truck, pre: "Free delivery", code: "", post: "all over Pakistan" },
+];
+
+function AnnouncementBar() {
+  const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (paused) return;
+    const id = window.setInterval(() => setActive((i) => (i + 1) % announcements.length), 3800);
+    return () => window.clearInterval(id);
+  }, [paused]);
+
+  useEffect(() => {
+    if (!copied) return;
+    const id = window.setTimeout(() => setCopied(false), 1600);
+    return () => window.clearTimeout(id);
+  }, [copied]);
+
+  async function copyCode() {
+    try {
+      await navigator.clipboard.writeText(PROMO_CODE);
+      setCopied(true);
+    } catch {
+      // Clipboard unavailable — the code stays visible on screen.
+    }
+  }
+
+  return (
+    <div
+      className="sticky top-0 z-50 border-b-2 border-plum bg-highlight text-accent-foreground"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-2.5 sm:px-6">
+        <div className="flex-1 overflow-hidden">
+          <div
+            className="flex transition-transform duration-500 ease-out"
+            style={{ transform: `translateX(-${active * 100}%)` }}
+          >
+            {announcements.map(({ icon: Icon, pre, code, post }) => (
+              <div
+                key={pre + post}
+                className="flex w-full shrink-0 items-center justify-center gap-2 whitespace-nowrap font-display text-[11px] font-extrabold uppercase tracking-wide sm:text-sm"
+              >
+                <Icon className="h-4 w-4 shrink-0" />
+                <span>{pre}</span>
+                {code && (
+                  <button
+                    onClick={copyCode}
+                    title="Click to copy"
+                    className="rounded-md border-2 border-dashed border-plum/50 px-1.5 py-0.5 font-mono text-[10px] font-bold normal-case tracking-normal transition-colors hover:bg-plum/10 sm:text-sm"
+                  >
+                    {copied ? "Copied!" : code}
+                  </button>
+                )}
+                <span>{post}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="flex shrink-0 items-center gap-1.5">
+          {announcements.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setActive(i)}
+              aria-label={`Show message ${i + 1}`}
+              className={`h-1.5 rounded-full transition-all ${i === active ? "w-5 bg-plum" : "w-1.5 bg-plum/30 hover:bg-plum/60"}`}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function OrderButton({ className = "" }: { className?: string }) {
   return (
     <a
@@ -45,7 +127,9 @@ function OrderButton({ className = "" }: { className?: string }) {
 
 function Index() {
   return (
-    <main className="overflow-hidden">
+    <>
+      <AnnouncementBar />
+      <main className="overflow-hidden">
       {/* Hero */}
       <section className="bg-hero text-plum-foreground">
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
@@ -149,6 +233,7 @@ function Index() {
       </section>
 
       <footer className="pb-10 text-center text-sm text-muted-foreground">© {new Date().getFullYear()} Styl5. All rights reserved.</footer>
-    </main>
+      </main>
+    </>
   );
 }
