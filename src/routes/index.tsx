@@ -61,6 +61,11 @@ function Index() {
             <p className="mt-6 max-w-md text-lg text-plum-foreground/80">
               Dry, curl, straighten, smooth and volumize — five interchangeable heads in a single powerful device.
             </p>
+            <div className="mt-7 flex flex-wrap items-center gap-3">
+              <span className="font-display text-5xl font-extrabold text-primary">Rs 4,999</span>
+              <span className="text-2xl font-semibold text-plum-foreground/50 line-through">Rs 5,499</span>
+              <span className="rounded-full bg-highlight px-3 py-1 text-sm font-bold text-accent-foreground">Save Rs 500</span>
+            </div>
             <div className="mt-8 flex flex-wrap gap-4">
               <OrderButton />
               <a href="#features" className="inline-flex items-center rounded-full px-6 py-4 font-medium hover:bg-plum-foreground/10">See features →</a>
@@ -134,6 +139,11 @@ function Index() {
         <div className="mx-auto max-w-4xl rounded-[2.5rem] bg-hero p-10 text-center text-plum-foreground shadow-pop md:p-16">
           <h2 className="text-4xl font-extrabold md:text-6xl">Ready for your <span className="text-highlight">best hair day?</span></h2>
           <p className="mx-auto mt-4 max-w-md text-plum-foreground/80">Get the complete 5-in-1 set delivered to your door.</p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <span className="font-display text-5xl font-extrabold text-primary md:text-6xl">Rs 4,999</span>
+            <span className="text-2xl font-semibold text-plum-foreground/50 line-through md:text-3xl">Rs 5,499</span>
+          </div>
+          <p className="mt-2 text-sm font-bold uppercase tracking-wide text-plum-foreground/70">Limited-time discount — you save Rs 500</p>
           <OrderButton className="mt-8 text-lg" />
         </div>
       </section>
