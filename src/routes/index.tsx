@@ -233,6 +233,7 @@ function Index() {
       </section>
 
       <footer className="pb-10 text-center text-sm text-muted-foreground">© {new Date().getFullYear()} Styl5. All rights reserved.</footer>
-    </main>
+      </main>
+    </>
   );
 }
