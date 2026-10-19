@@ -128,6 +128,7 @@ function OrderButton({ className = "" }: { className?: string }) {
 function Index() {
   return (
     <main className="overflow-hidden">
+      <AnnouncementBar />
       {/* Hero */}
       <section className="bg-hero text-plum-foreground">
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
