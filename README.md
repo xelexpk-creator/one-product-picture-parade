@@ -24,3 +24,9 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+## Order API
+
+The storefront checkout, public tracking page, and `/admin` dashboard use the Express + MongoDB API in the adjacent `backend` folder. Start MongoDB and the backend first, then set `VITE_API_BASE_URL` in `.env` to the backend API URL (default: `http://localhost:4000/api/v1`) and run the storefront.
+
+Admin JWT and optional Cloudinary secrets must be configured only in the backend `.env`; they must never use a `VITE_` prefix. Checkout offers Cash on delivery and Pay Online (bank transfer with a required screenshot). See [the backend setup guide](../backend/README.md) for configuration and the Postman collection.

@@ -4,14 +4,38 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+
+const META_PIXEL_ID = "2162578964648828";
+
+const META_PIXEL_SCRIPT = `
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '${META_PIXEL_ID}');
+fbq('track', 'PageView');
+`;
+
+const META_PIXEL_NOSCRIPT = `<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1" alt="" />`;
+
+declare global {
+  interface Window {
+    fbq?: (...args: unknown[]) => void;
+  }
+}
 
 function NotFoundComponent() {
   return (
@@ -82,7 +106,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Dry, curl, straighten, smooth and volumize with one tool." },
       { name: "author", content: "Lovable" },
       { property: "og:title", content: "5-in-1 Hair Styler" },
-      { property: "og:description", content: "Dry, curl, straighten, smooth and volumize with one tool." },
+      {
+        property: "og:description",
+        content: "Dry, curl, straighten, smooth and volumize with one tool.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
@@ -93,8 +120,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=DM+Sans:wght@400;500;700&display=swap" },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=DM+Sans:wght@400;500;700&display=swap",
+      },
+      { rel: "icon", href: "/favicon.png", type: "image/x-icon" },
     ],
   }),
   shellComponent: RootShell,
@@ -108,8 +138,10 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <script dangerouslySetInnerHTML={{ __html: META_PIXEL_SCRIPT }} />
       </head>
       <body>
+        <noscript dangerouslySetInnerHTML={{ __html: META_PIXEL_NOSCRIPT }} />
         {children}
         <Scripts />
       </body>
@@ -119,6 +151,18 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const isInitialPageView = useRef(true);
+
+  // The base pixel already sends PageView on the initial load. Re-send it on
+  // client-side navigations so every route change is tracked.
+  useEffect(() => {
+    if (isInitialPageView.current) {
+      isInitialPageView.current = false;
+      return;
+    }
+    window.fbq?.("track", "PageView");
+  }, [pathname]);
 
   return (
     <QueryClientProvider client={queryClient}>
